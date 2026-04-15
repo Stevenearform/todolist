@@ -29,6 +29,8 @@ flowchart TD
   TodoPage --> EmptyState[EmptyState]
 ```
 
+
+
 Notes:
 
 - **ErrorState** and the list or **EmptyState** are **mutually exclusive** in the main panel when `error` is set; when there is no error, show **TodoList** or **EmptyState** depending on count.
@@ -56,13 +58,16 @@ type TodoAppState = {
 
 ## Files (implementation map)
 
-| Area        | Responsibility                                      |
-| ----------- | --------------------------------------------------- |
-| `AppShell`  | Page frame, `Outlet` for nested routes              |
-| `AppHeader` | Brand row + simulate-error control                  |
-| `TodoPage`  | Reducer, conditional Empty / Error / List           |
-| `TodoComposer` | Controlled input + Add button                    |
-| `TodoList`  | Maps todos to `TodoItem`                            |
-| `TodoItem`  | Complete toggle, title, delete                      |
-| `EmptyState`| Zero todos, no error                                |
-| `ErrorState`| User-visible failure + Retry                        |
+
+| Area           | Responsibility                            |
+| -------------- | ----------------------------------------- |
+| `AppShell`     | Page frame, `Outlet` for nested routes    |
+| `AppHeader`    | Brand row + simulate-error control        |
+| `TodoPage`     | Reducer, conditional Empty / Error / List |
+| `TodoComposer` | Controlled input + Add button             |
+| `TodoList`     | Maps todos to `TodoItem`                  |
+| `TodoItem`     | Complete toggle, title, delete            |
+| `EmptyState`   | Zero todos, no error                      |
+| `ErrorState`   | User-visible failure + Retry              |
+
+

@@ -6,17 +6,16 @@ type ErrorStateProps = {
 export function ErrorState({ message, onRetry }: ErrorStateProps) {
   return (
     <div
-      className="mt-8 rounded-xl border border-red-200 bg-red-50 px-5 py-8 text-center dark:border-red-900/60 dark:bg-red-950/40"
+      className="mt-10 rounded-[1.75rem] border border-sky-200/90 bg-gradient-to-b from-sky-50 to-slate-50/90 px-6 py-10 text-center shadow-inner"
       role="alert"
     >
-      <h2 className="text-lg font-semibold text-red-900 dark:text-red-200">
-        We hit a snag
-      </h2>
-      <p className="mt-2 text-sm text-red-800/90 dark:text-red-200/90">{message}</p>
+      <p className="text-xs font-bold uppercase tracking-wider text-sky-700">Sync issue</p>
+      <h2 className="font-display mt-2 text-xl font-bold text-slate-900">Let’s try that again</h2>
+      <p className="mt-3 text-sm leading-relaxed text-slate-600">{message}</p>
       <button
         type="button"
         onClick={onRetry}
-        className="mt-6 h-11 min-w-36 rounded-lg bg-red-800 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-red-900 dark:bg-red-300 dark:text-red-950 dark:hover:bg-red-200"
+        className="font-display mt-8 h-12 min-w-40 rounded-lg bg-gradient-to-br from-sky-600 to-cyan-600 px-6 text-sm font-bold text-white shadow-[0_12px_28px_-8px_rgba(14,116,144,0.4)] transition hover:brightness-105"
       >
         Retry
       </button>
