@@ -68,7 +68,7 @@ export function TodoItem({
         >
           {todo.title}
         </p>
-        <p className="text-left text-[11px] leading-snug text-ds-gray-3 sm:text-xs">
+        <p className="pt-[8px] text-left text-[11px] leading-snug text-ds-gray-3 sm:text-xs">
           {todo.completed ? (
             <>
               Completed · <span className="tabular-nums text-ds-gray-4">{spent}</span> in focus
