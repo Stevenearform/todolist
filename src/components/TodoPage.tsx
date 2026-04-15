@@ -1,13 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useTodoApp } from '../context/useTodoApp'
 import { EmptyState } from './EmptyState'
 import { ErrorState } from './ErrorState'
 import { FocusDecor } from './FocusDecor'
 import { FocusTimerModal } from './FocusTimerModal'
+import { TaskCreateLoadingOverlay } from './TaskCreateLoadingOverlay'
 import { TodoComposer } from './TodoComposer'
 import { TodoList } from './TodoList'
 
 const POMODORO_SECONDS = 25 * 60
+/** Minimum time to show create-task loading so the animation is perceptible (sync add is instant). */
+const TASK_CREATE_UI_MS = 2000
 
 export function TodoPage() {
   const { state, dispatch } = useTodoApp()
@@ -18,6 +21,8 @@ export function TodoPage() {
   const [isRunning, setIsRunning] = useState(false)
   const [selectPulseKey, setSelectPulseKey] = useState(0)
   const [focusModalOpen, setFocusModalOpen] = useState(false)
+  const [isCreatingTask, setIsCreatingTask] = useState(false)
+  const createTaskTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const selectedTodo = useMemo(() => {
     if (!selectedId || !todos.some((t) => t.id === selectedId)) return null
@@ -65,6 +70,30 @@ export function TodoPage() {
     setSecondsLeft(POMODORO_SECONDS)
   }, [])
 
+  useEffect(() => {
+    return () => {
+      if (createTaskTimeoutRef.current) {
+        window.clearTimeout(createTaskTimeoutRef.current)
+      }
+    }
+  }, [])
+
+  const handleAddTask = useCallback(
+    (title: string) => {
+      if (createTaskTimeoutRef.current) {
+        window.clearTimeout(createTaskTimeoutRef.current)
+        createTaskTimeoutRef.current = null
+      }
+      setIsCreatingTask(true)
+      dispatch({ type: 'ADD', title })
+      createTaskTimeoutRef.current = window.setTimeout(() => {
+        createTaskTimeoutRef.current = null
+        setIsCreatingTask(false)
+      }, TASK_CREATE_UI_MS)
+    },
+    [dispatch],
+  )
+
   const handleSelectTodo = useCallback((id: string) => {
     setSelectPulseKey((k) => k + 1)
     setFocusModalOpen(true)
@@ -91,8 +120,8 @@ export function TodoPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-10">
-      <div className="flex min-w-0 flex-1 flex-col">
-        <TodoComposer onAdd={(title) => dispatch({ type: 'ADD', title })} />
+      <div className="relative flex min-w-0 flex-1 flex-col">
+        <TodoComposer onAdd={handleAddTask} isSubmitting={isCreatingTask} />
 
         {error ? (
           <ErrorState message={error} onRetry={() => dispatch({ type: 'CLEAR_ERROR' })} />
@@ -108,6 +137,8 @@ export function TodoPage() {
             onDelete={handleDelete}
           />
         )}
+
+        <TaskCreateLoadingOverlay open={isCreatingTask} />
       </div>
 
       <FocusTimerModal open={isFocusModalVisible} onClose={() => setFocusModalOpen(false)}>

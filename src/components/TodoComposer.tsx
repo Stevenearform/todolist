@@ -3,12 +3,15 @@ import type { FormEvent } from 'react'
 
 type TodoComposerProps = {
   onAdd: (title: string) => void
+  /** Disables fields while parent shows the create-task loading state. */
+  isSubmitting?: boolean
 }
 
-export function TodoComposer({ onAdd }: TodoComposerProps) {
+export function TodoComposer({ onAdd, isSubmitting = false }: TodoComposerProps) {
   const [value, setValue] = useState('')
 
   function submit() {
+    if (isSubmitting) return
     const trimmed = value.trim()
     if (!trimmed) return
     onAdd(trimmed)
@@ -23,6 +26,7 @@ export function TodoComposer({ onAdd }: TodoComposerProps) {
   return (
     <form
       onSubmit={onSubmit}
+      aria-busy={isSubmitting}
       className="grid w-full gap-x-3 gap-y-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
     >
       <label
@@ -37,18 +41,30 @@ export function TodoComposer({ onAdd }: TodoComposerProps) {
           id="todo-input"
           type="text"
           autoComplete="off"
+          disabled={isSubmitting}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="What will you tackle next?"
-          className="font-display min-h-0 w-full flex-1 border-0 bg-transparent p-0 text-base font-medium leading-none text-ds-ink outline-none placeholder:text-ds-gray-3 focus:ring-0"
+          className="font-display min-h-0 w-full flex-1 border-0 bg-transparent p-0 text-base font-medium leading-none text-ds-ink outline-none placeholder:text-ds-gray-3 focus:ring-0 disabled:cursor-not-allowed disabled:opacity-50"
         />
       </div>
 
       <button
         type="submit"
-        className="box-border inline-flex h-12 min-h-12 w-full shrink-0 items-center justify-center rounded-lg bg-ds-primary px-8 text-sm font-semibold leading-none text-white shadow-ds-lift transition hover:bg-ds-primary-hover active:shadow-ds-press sm:w-auto"
+        disabled={isSubmitting}
+        className="box-border inline-flex h-12 min-h-12 w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-ds-primary px-8 text-sm font-semibold leading-none text-white shadow-ds-lift transition hover:bg-ds-primary-hover active:shadow-ds-press disabled:cursor-not-allowed disabled:opacity-80 sm:w-auto"
       >
-        Add task
+        {isSubmitting ? (
+          <>
+            <span
+              className="size-4 shrink-0 rounded-full border-2 border-white/35 border-t-white motion-safe:animate-spin"
+              aria-hidden
+            />
+            <span>Adding…</span>
+          </>
+        ) : (
+          'Add task'
+        )}
       </button>
     </form>
   )
