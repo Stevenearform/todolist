@@ -4,7 +4,6 @@ import { EmptyState } from './EmptyState'
 import { ErrorState } from './ErrorState'
 import { FocusDecor } from './FocusDecor'
 import { FocusTimerModal } from './FocusTimerModal'
-import { TaskCreateLoadingOverlay } from './TaskCreateLoadingOverlay'
 import { TodoComposer } from './TodoComposer'
 import { TodoList } from './TodoList'
 
@@ -120,7 +119,7 @@ export function TodoPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-10">
-      <div className="relative flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col">
         <TodoComposer onAdd={handleAddTask} isSubmitting={isCreatingTask} />
 
         {error ? (
@@ -137,8 +136,6 @@ export function TodoPage() {
             onDelete={handleDelete}
           />
         )}
-
-        <TaskCreateLoadingOverlay open={isCreatingTask} />
       </div>
 
       <FocusTimerModal open={isFocusModalVisible} onClose={() => setFocusModalOpen(false)}>

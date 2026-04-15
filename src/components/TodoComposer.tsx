@@ -3,7 +3,7 @@ import type { FormEvent } from 'react'
 
 type TodoComposerProps = {
   onAdd: (title: string) => void
-  /** Disables fields while parent shows the create-task loading state. */
+  /** Shows loading state on the Add button; input disabled while true. */
   isSubmitting?: boolean
 }
 
@@ -52,15 +52,16 @@ export function TodoComposer({ onAdd, isSubmitting = false }: TodoComposerProps)
       <button
         type="submit"
         disabled={isSubmitting}
-        className="box-border inline-flex h-12 min-h-12 w-full shrink-0 items-center justify-center gap-2 rounded-lg bg-ds-primary px-8 text-sm font-semibold leading-none text-white shadow-ds-lift transition hover:bg-ds-primary-hover active:shadow-ds-press disabled:cursor-not-allowed disabled:opacity-80 sm:w-auto"
+        aria-busy={isSubmitting}
+        className="box-border inline-flex h-12 min-h-12 w-full min-w-[8.5rem] shrink-0 items-center justify-center gap-2 rounded-lg bg-ds-primary px-6 text-sm font-semibold leading-none text-white shadow-ds-lift transition hover:bg-ds-primary-hover active:shadow-ds-press disabled:pointer-events-none disabled:opacity-90 sm:w-auto sm:min-w-[9.25rem] sm:px-8"
       >
         {isSubmitting ? (
           <>
             <span
-              className="size-4 shrink-0 rounded-full border-2 border-white/35 border-t-white motion-safe:animate-spin"
+              className="size-[18px] shrink-0 rounded-full border-2 border-white/30 border-t-white motion-safe:animate-spin"
               aria-hidden
             />
-            <span>Adding…</span>
+            <span className="tabular-nums">Adding…</span>
           </>
         ) : (
           'Add task'
