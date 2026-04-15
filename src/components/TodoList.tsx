@@ -3,11 +3,19 @@ import { TodoItem } from './TodoItem'
 
 type TodoListProps = {
   todos: Todo[]
+  selectedId: string | null
+  onSelectTodo: (id: string) => void
   onToggle: (id: string) => void
   onDelete: (id: string) => void
 }
 
-export function TodoList({ todos, onToggle, onDelete }: TodoListProps) {
+export function TodoList({
+  todos,
+  selectedId,
+  onSelectTodo,
+  onToggle,
+  onDelete,
+}: TodoListProps) {
   return (
     <div className="mt-8">
       <div className="mb-3 flex items-center justify-between gap-2">
@@ -20,7 +28,14 @@ export function TodoList({ todos, onToggle, onDelete }: TodoListProps) {
       </div>
       <ul className="flex flex-col gap-2.5">
         {todos.map((todo) => (
-          <TodoItem key={todo.id} todo={todo} onToggle={onToggle} onDelete={onDelete} />
+          <TodoItem
+            key={todo.id}
+            todo={todo}
+            isSelected={todo.id === selectedId}
+            onSelect={() => onSelectTodo(todo.id)}
+            onToggle={onToggle}
+            onDelete={onDelete}
+          />
         ))}
       </ul>
     </div>

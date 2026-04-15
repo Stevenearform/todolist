@@ -2,13 +2,21 @@ import type { Todo } from '../types/todo'
 
 type TodoItemProps = {
   todo: Todo
+  isSelected: boolean
+  onSelect: () => void
   onToggle: (id: string) => void
   onDelete: (id: string) => void
 }
 
-export function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
+export function TodoItem({ todo, isSelected, onSelect, onToggle, onDelete }: TodoItemProps) {
   return (
-    <li className="flex min-h-12 items-center gap-3 rounded-md border border-sky-100/90 bg-gradient-to-r from-white to-sky-50/40 px-3 py-2 shadow-sm transition hover:border-sky-200/90 hover:shadow-md">
+    <li
+      onClick={onSelect}
+      aria-current={isSelected ? 'true' : undefined}
+      className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-md border border-sky-100/90 bg-gradient-to-r from-white to-sky-50/40 px-3 py-2 shadow-sm transition hover:border-sky-200/90 hover:shadow-md ${
+        isSelected ? 'ring-2 ring-sky-400 ring-offset-2 ring-offset-white' : ''
+      }`}
+    >
       <button
         type="button"
         role="checkbox"
@@ -16,7 +24,10 @@ export function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
         aria-label={
           todo.completed ? `Mark "${todo.title}" incomplete` : `Mark "${todo.title}" complete`
         }
-        onClick={() => onToggle(todo.id)}
+        onClick={(e) => {
+          e.stopPropagation()
+          onToggle(todo.id)
+        }}
         className={`flex size-12 shrink-0 items-center justify-center rounded-full border-2 transition ${
           todo.completed
             ? 'border-transparent bg-gradient-to-br from-sky-500 to-cyan-600 text-white shadow-inner'
@@ -36,7 +47,10 @@ export function TodoItem({ todo, onToggle, onDelete }: TodoItemProps) {
       </span>
       <button
         type="button"
-        onClick={() => onDelete(todo.id)}
+        onClick={(e) => {
+          e.stopPropagation()
+          onDelete(todo.id)
+        }}
         aria-label={`Delete ${todo.title}`}
         className="inline-flex min-h-12 min-w-12 shrink-0 items-center justify-center rounded-md px-3 text-sm font-semibold text-sky-500 transition hover:bg-sky-100/80 hover:text-sky-700"
       >
