@@ -3,6 +3,7 @@ import { useTodoApp } from '../context/useTodoApp'
 import { EmptyState } from './EmptyState'
 import { ErrorState } from './ErrorState'
 import { FocusDecor } from './FocusDecor'
+import { FocusTimerModal } from './FocusTimerModal'
 import { TodoComposer } from './TodoComposer'
 import { TodoList } from './TodoList'
 
@@ -15,11 +16,15 @@ export function TodoPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [secondsLeft, setSecondsLeft] = useState(POMODORO_SECONDS)
   const [isRunning, setIsRunning] = useState(false)
+  const [selectPulseKey, setSelectPulseKey] = useState(0)
+  const [focusModalOpen, setFocusModalOpen] = useState(false)
 
   const selectedTodo = useMemo(() => {
     if (!selectedId || !todos.some((t) => t.id === selectedId)) return null
     return todos.find((t) => t.id === selectedId) ?? null
   }, [todos, selectedId])
+
+  const isFocusModalVisible = focusModalOpen && Boolean(selectedTodo)
 
   const handleDelete = useCallback(
     (id: string) => {
@@ -28,14 +33,16 @@ export function TodoPage() {
         setSelectedId(null)
         setSecondsLeft(POMODORO_SECONDS)
         setIsRunning(false)
+        setFocusModalOpen(false)
       }
     },
     [dispatch, selectedId],
   )
 
   useEffect(() => {
-    if (!isRunning) return
+    if (!isRunning || !selectedId) return
     const id = window.setInterval(() => {
+      dispatch({ type: 'ADD_FOCUS_SECONDS', id: selectedId, seconds: 1 })
       setSecondsLeft((prev) => {
         if (prev <= 1) {
           window.clearInterval(id)
@@ -46,7 +53,7 @@ export function TodoPage() {
       })
     }, 1000)
     return () => window.clearInterval(id)
-  }, [isRunning])
+  }, [isRunning, selectedId, dispatch])
 
   const handleStart = useCallback(() => {
     if (!selectedTodo || secondsLeft <= 0) return
@@ -59,6 +66,8 @@ export function TodoPage() {
   }, [])
 
   const handleSelectTodo = useCallback((id: string) => {
+    setSelectPulseKey((k) => k + 1)
+    setFocusModalOpen(true)
     setSelectedId((prev) => {
       if (prev !== id) {
         queueMicrotask(() => {
@@ -70,17 +79,18 @@ export function TodoPage() {
     })
   }, [])
 
-  return (
-    <div className="flex flex-1 flex-col gap-10 lg:grid lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1.35fr)] lg:items-start lg:gap-12">
-      <FocusDecor
-        selectedTodo={selectedTodo}
-        secondsLeft={secondsLeft}
-        totalSeconds={POMODORO_SECONDS}
-        isRunning={isRunning}
-        onStart={handleStart}
-        onEnd={handleEnd}
-      />
+  const focusDecorProps = {
+    selectedTodo,
+    secondsLeft,
+    totalSeconds: POMODORO_SECONDS,
+    isRunning,
+    selectPulseKey,
+    onStart: handleStart,
+    onEnd: handleEnd,
+  } as const
 
+  return (
+    <div className="flex flex-1 flex-col gap-10">
       <div className="flex min-w-0 flex-1 flex-col">
         <TodoComposer onAdd={(title) => dispatch({ type: 'ADD', title })} />
 
@@ -92,12 +102,17 @@ export function TodoPage() {
           <TodoList
             todos={todos}
             selectedId={selectedTodo?.id ?? null}
+            isFocusTimerRunning={isRunning}
             onSelectTodo={handleSelectTodo}
             onToggle={(id) => dispatch({ type: 'TOGGLE', id })}
             onDelete={handleDelete}
           />
         )}
       </div>
+
+      <FocusTimerModal open={isFocusModalVisible} onClose={() => setFocusModalOpen(false)}>
+        <FocusDecor {...focusDecorProps} variant="modal" />
+      </FocusTimerModal>
     </div>
   )
 }

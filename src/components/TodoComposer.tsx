@@ -23,15 +23,16 @@ export function TodoComposer({ onAdd }: TodoComposerProps) {
   return (
     <form
       onSubmit={onSubmit}
-      className="flex flex-col gap-3 sm:flex-row sm:items-stretch"
+      className="grid w-full gap-x-3 gap-y-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center"
     >
-      <div className="min-w-0 flex-1">
-        <label
-          htmlFor="todo-input"
-          className="mb-2 block text-left text-xs font-bold uppercase tracking-wider text-slate-500"
-        >
-          New task
-        </label>
+      <label
+        htmlFor="todo-input"
+        className="text-left text-xs font-semibold uppercase tracking-wider text-ds-gray-3 sm:col-span-2"
+      >
+        New task
+      </label>
+
+      <div className="box-border flex h-12 min-h-12 w-full min-w-0 items-center rounded-lg border border-ds-gray-2 bg-ds-card px-4 shadow-ds-lift ring-ds-primary/20 focus-within:border-ds-primary focus-within:ring-4">
         <input
           id="todo-input"
           type="text"
@@ -39,17 +40,16 @@ export function TodoComposer({ onAdd }: TodoComposerProps) {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           placeholder="What will you tackle next?"
-          className="font-display h-12 w-full rounded-lg border-2 border-sky-300/90 bg-gradient-to-b from-white to-sky-50/50 px-4 text-base font-medium text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] outline-none ring-sky-400/30 placeholder:text-slate-400 focus:border-sky-500 focus:ring-4"
+          className="font-display min-h-0 w-full flex-1 border-0 bg-transparent p-0 text-base font-medium leading-none text-ds-ink outline-none placeholder:text-ds-gray-3 focus:ring-0"
         />
       </div>
-      <div className="flex flex-col justify-end sm:pt-7">
-        <button
-          type="submit"
-          className="font-display h-12 shrink-0 rounded-lg bg-gradient-to-br from-sky-600 to-cyan-600 px-8 text-sm font-bold text-white shadow-[0_12px_28px_-8px_rgba(14,116,144,0.45)] transition hover:brightness-105 active:translate-y-px"
-        >
-          Add task
-        </button>
-      </div>
+
+      <button
+        type="submit"
+        className="box-border inline-flex h-12 min-h-12 w-full shrink-0 items-center justify-center rounded-lg bg-ds-primary px-8 text-sm font-semibold leading-none text-white shadow-ds-lift transition hover:bg-ds-primary-hover active:shadow-ds-press sm:w-auto"
+      >
+        Add task
+      </button>
     </form>
   )
 }

@@ -9,6 +9,7 @@ export type TodoAction =
   | { type: 'ADD'; title: string }
   | { type: 'TOGGLE'; id: string }
   | { type: 'DELETE'; id: string }
+  | { type: 'ADD_FOCUS_SECONDS'; id: string; seconds: number }
   | { type: 'SIMULATE_ERROR' }
   | { type: 'CLEAR_ERROR' }
 
@@ -22,6 +23,7 @@ export function todoReducer(state: TodoAppState, action: TodoAction): TodoAppSta
         title,
         completed: false,
         createdAt: new Date().toISOString(),
+        focusSecondsLogged: 0,
       }
       return { ...state, todos: [next, ...state.todos] }
     }
@@ -37,6 +39,17 @@ export function todoReducer(state: TodoAppState, action: TodoAction): TodoAppSta
         ...state,
         todos: state.todos.filter((t) => t.id !== action.id),
       }
+    case 'ADD_FOCUS_SECONDS': {
+      if (action.seconds <= 0) return state
+      return {
+        ...state,
+        todos: state.todos.map((t) =>
+          t.id === action.id
+            ? { ...t, focusSecondsLogged: t.focusSecondsLogged + action.seconds }
+            : t,
+        ),
+      }
+    }
     case 'SIMULATE_ERROR':
       return {
         ...state,

@@ -1,20 +1,80 @@
 @import 'tailwindcss';
 
+/* Class-based dark (html.dark); tokens swap via CSS variables. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Tokens aligned with Webflow-style guide; values follow semantic vars for light/dark. */
 @theme {
-  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  --color-ds-page: var(--ds-page);
+  --color-ds-card: var(--ds-card);
+  --color-ds-ink: var(--ds-ink);
+  --color-ds-gray-4: var(--ds-gray-4);
+  --color-ds-gray-3: var(--ds-gray-3);
+  --color-ds-gray-2: var(--ds-gray-2);
+  --color-ds-gray-1: var(--ds-gray-1);
+  --color-ds-primary: var(--ds-primary);
+  --color-ds-primary-hover: var(--ds-primary-hover);
+  --color-ds-primary-soft: var(--ds-primary-soft);
+  --color-ds-secondary: var(--ds-secondary);
+  --color-ds-highlight: var(--ds-highlight);
+
+  --shadow-ds-lift: var(--ds-shadow-lift);
+  --shadow-ds-lift-lg: var(--ds-shadow-lift-lg);
+  --shadow-ds-press: var(--ds-shadow-press);
 }
 
 @layer base {
+  :root {
+    --ds-page: #ebedf3;
+    --ds-card: #ffffff;
+    --ds-ink: #22242c;
+    --ds-gray-4: #484b55;
+    --ds-gray-3: #999dac;
+    --ds-gray-2: #c2c4cf;
+    --ds-gray-1: #ebedf3;
+    --ds-primary: #4263eb;
+    --ds-primary-hover: #3651d4;
+    --ds-primary-soft: #e8edfd;
+    --ds-secondary: #7048e8;
+    --ds-highlight: #cf51c2;
+    --ds-shadow-lift: 0 4px 16px -4px rgb(34 36 44 / 0.1);
+    --ds-shadow-lift-lg: 0 8px 28px -6px rgb(34 36 44 / 0.12);
+    --ds-shadow-press: inset 0 2px 4px rgb(34 36 44 / 0.06);
+  }
+
+  .dark {
+    --ds-page: #0c0d12;
+    --ds-card: #16171f;
+    --ds-ink: #ebedf3;
+    --ds-gray-4: #c5c7d2;
+    --ds-gray-3: #8b8d9c;
+    --ds-gray-2: #3e3f4d;
+    --ds-gray-1: #24252f;
+    --ds-primary: #5c7cfa;
+    --ds-primary-hover: #7b91fc;
+    --ds-primary-soft: rgb(92 124 250 / 0.16);
+    --ds-secondary: #9d86f0;
+    --ds-highlight: #e07ad4;
+    --ds-shadow-lift: 0 4px 20px -4px rgb(0 0 0 / 0.45);
+    --ds-shadow-lift-lg: 0 12px 40px -10px rgb(0 0 0 / 0.55);
+    --ds-shadow-press: inset 0 2px 4px rgb(0 0 0 / 0.35);
+  }
+
   html {
-    /* Scales Tailwind text-* / spacing rem units (~12.5% larger than browser default 16px). */
-    font-size: 112.5%;
+    font-size: 100%;
   }
 
   body {
     margin: 0;
     min-height: 100dvh;
     font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--color-ds-ink);
+    background-color: var(--color-ds-page);
     -webkit-font-smoothing: antialiased;
   }
 
@@ -27,12 +87,64 @@
   font-family: var(--font-display);
 }
 
-/* Calm blue page atmosphere */
-.bg-app-gradient {
-  background-color: #f0f7ff;
-  background-image:
-    radial-gradient(ellipse 120% 80% at 8% -15%, rgb(224 242 254 / 0.95), transparent 52%),
-    radial-gradient(ellipse 90% 70% at 100% 5%, rgb(199 210 254 / 0.45), transparent 48%),
-    radial-gradient(ellipse 55% 45% at 50% 100%, rgb(186 230 253 / 0.4), transparent 42%),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+/* Task row → focus timer handoff (respect reduced motion). */
+@keyframes timer-handoff {
+  0% {
+    transform: translateY(14px) scale(0.96);
+    opacity: 0.88;
+    box-shadow: 0 0 0 0 var(--ds-primary-soft);
+  }
+  55% {
+    transform: translateY(-2px) scale(1.02);
+    opacity: 1;
+    box-shadow:
+      0 0 0 3px var(--ds-primary-soft),
+      var(--ds-shadow-lift);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    box-shadow: var(--ds-shadow-lift);
+  }
 }
+
+@keyframes timer-title-pop {
+  0% {
+    transform: translateY(6px);
+    opacity: 0.65;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes timer-progress-flash {
+  0% {
+    filter: brightness(1.35);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+.animate-timer-handoff {
+  animation: timer-handoff 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-timer-title {
+  animation: timer-title-pop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-timer-progress-flash {
+  animation: timer-progress-flash 0.5s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-timer-handoff,
+  .animate-timer-title,
+  .animate-timer-progress-flash {
+    animation: none !important;
+  }
+}
+
