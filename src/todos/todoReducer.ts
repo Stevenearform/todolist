@@ -1,3 +1,4 @@
+import { createTodoId } from '../lib/createTodoId'
 import type { Todo } from '../types/todo'
 
 export type TodoAppState = {
@@ -19,7 +20,7 @@ export function todoReducer(state: TodoAppState, action: TodoAction): TodoAppSta
       const title = action.title.trim()
       if (!title) return state
       const next: Todo = {
-        id: crypto.randomUUID(),
+        id: createTodoId(),
         title,
         completed: false,
         createdAt: new Date().toISOString(),

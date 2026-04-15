@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Local QR for phone preview (IP changes per network)
+dev-qr.png
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
