@@ -100,7 +100,7 @@ export function TodoItem({
               Opens a modal with the focus timer when you select this task.
             </p>
             <span
-              className="inline-flex w-fit items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-white/95 sm:px-3 sm:text-xs"
+              className="inline-flex w-fit max-w-full flex-wrap items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide leading-snug text-white/95 sm:px-3 sm:text-xs"
               aria-hidden
             >
               <svg
@@ -118,7 +118,7 @@ export function TodoItem({
                 <circle cx="12" cy="12" r="9" />
                 <path d="M12 7v5l3 2" />
               </svg>
-              <span>Focus timer</span>
+              <span>click to start your focus timer</span>
             </span>
             <p className="pt-2 text-left text-xs leading-relaxed text-white/75 sm:pt-2.5 sm:text-sm">
               <span className="font-semibold uppercase tracking-wide text-white">In progress</span>

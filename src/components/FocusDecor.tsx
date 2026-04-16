@@ -79,7 +79,7 @@ export function FocusDecor({
         >
           <div className="flex min-h-[80px] w-full flex-nowrap items-center gap-3 rounded-[calc(0.75rem-1px)] px-4 py-3">
             <p
-              className={`shrink-0 text-2xl font-medium leading-none tracking-tight tabular-nums sm:text-3xl ${
+              className={`inline-block w-[7ch] shrink-0 text-right text-2xl font-medium leading-none tracking-tight tabular-nums sm:text-3xl ${
                 selectedTodo ? 'text-ds-ink' : 'text-ds-gray-3'
               }`}
               aria-live="polite"
