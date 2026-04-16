@@ -27,8 +27,8 @@ export function TodoList({
 
   return (
     <div className="mt-8">
-      <div className="mb-4 flex items-center justify-between gap-2">
-        <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-ds-gray-3">
+      <div className="mb-5 flex items-center justify-between gap-2 sm:mb-6">
+        <h2 className="text-sm font-medium uppercase tracking-wider text-ds-gray-3">
           In progress
         </h2>
         <span className="rounded-full bg-ds-primary-soft px-3 py-0.5 text-xs font-semibold text-ds-primary">
@@ -40,7 +40,7 @@ export function TodoList({
           No active tasks. Mark a task incomplete to move it back here, or add a new one above.
         </p>
       ) : (
-        <ul className="flex flex-col gap-2">
+        <ul className="flex flex-col gap-4 sm:gap-5">
           {active.map((todo) => (
             <TodoItem
               key={todo.id}
@@ -56,16 +56,16 @@ export function TodoList({
       )}
 
       {completed.length > 0 ? (
-        <div className="mt-10">
-          <div className="mb-4 flex items-center justify-between gap-2">
-            <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-ds-gray-3">
+        <div className="mt-12 sm:mt-14">
+          <div className="mb-5 flex items-center justify-between gap-2 sm:mb-6">
+            <h2 className="text-sm font-medium uppercase tracking-wider text-ds-gray-3">
               Completed
             </h2>
             <span className="rounded-full border border-ds-gray-2 bg-ds-gray-1 px-3 py-0.5 text-xs font-semibold text-ds-gray-4">
               {completed.length} {completed.length === 1 ? 'task' : 'tasks'}
             </span>
           </div>
-          <ul className="flex flex-col gap-2">
+          <ul className="flex flex-col gap-4 sm:gap-5">
             {completed.map((todo) => (
               <TodoItem
                 key={todo.id}

@@ -38,9 +38,35 @@ export function FocusDecor({
       ? 'flex w-full flex-col items-stretch justify-center border-0 pt-0'
       : 'flex w-full flex-col items-stretch justify-center border-t border-ds-gray-1 pt-10 lg:border-t-0 lg:pt-0'
 
+  const tagline = (
+    <p
+      className={`w-full text-left text-[0.75rem] font-medium uppercase leading-relaxed tracking-[0.16em] text-ds-gray-3 ${
+        variant === 'modal' ? 'mb-4' : 'mt-5'
+      }`}
+    >
+      Break work into focused tasks
+    </p>
+  )
+
   return (
     <aside className={asideClass}>
       <div className="relative w-full">
+        {variant === 'modal' ? tagline : null}
+        {selectedTodo ? (
+          <p
+            key={`${selectedTodo.id}-${selectPulseKey}`}
+            className={`mb-3 line-clamp-2 text-left text-sm font-medium leading-snug text-ds-gray-4 ${playHandoff ? 'animate-timer-title' : ''}`}
+          >
+            {selectedTodo.title}
+          </p>
+        ) : (
+          <p className="mb-3 text-left text-sm text-ds-gray-3">
+            {variant === 'modal'
+              ? 'Choose a task from the list to focus.'
+              : 'Select a task above, then press Start.'}
+          </p>
+        )}
+
         <div
           key={playHandoff ? `timer-strip-${selectPulseKey}` : 'timer-strip'}
           className={`relative z-10 w-full rounded-xl border border-ds-gray-2 bg-ds-card shadow-ds-lift ${playHandoff ? 'animate-timer-handoff' : ''}`}
@@ -53,7 +79,7 @@ export function FocusDecor({
         >
           <div className="flex min-h-[80px] w-full flex-nowrap items-center gap-3 rounded-[calc(0.75rem-1px)] px-4 py-3">
             <p
-              className={`shrink-0 font-display text-2xl font-semibold leading-none tracking-tight tabular-nums sm:text-3xl ${
+              className={`shrink-0 text-2xl font-medium leading-none tracking-tight tabular-nums sm:text-3xl ${
                 selectedTodo ? 'text-ds-ink' : 'text-ds-gray-3'
               }`}
               aria-live="polite"
@@ -61,7 +87,7 @@ export function FocusDecor({
             >
               {selectedTodo ? formatCountdown(secondsLeft) : '—:—'}
             </p>
-            <p className="w-[4.75rem] shrink-0 text-[0.75rem] font-semibold uppercase leading-tight tracking-[0.12em] text-ds-secondary">
+            <p className="w-[4.75rem] shrink-0 text-[0.75rem] font-medium uppercase leading-tight tracking-[0.12em] text-ds-secondary">
               Focus block
             </p>
             <div className="min-w-0 flex-1">
@@ -75,21 +101,6 @@ export function FocusDecor({
             </div>
           </div>
         </div>
-
-        {selectedTodo ? (
-          <p
-            key={`${selectedTodo.id}-${selectPulseKey}`}
-            className={`mt-3 line-clamp-2 text-center text-sm font-medium leading-snug text-ds-gray-4 md:text-left ${playHandoff ? 'animate-timer-title' : ''}`}
-          >
-            {selectedTodo.title}
-          </p>
-        ) : (
-          <p className="mt-3 text-center text-sm text-ds-gray-3 md:text-left">
-            {variant === 'modal'
-              ? 'Choose a task from the list to focus.'
-              : 'Select a task above, then press Start.'}
-          </p>
-        )}
 
         <div className="mt-4 flex w-full min-w-0 gap-2">
           <button
@@ -110,9 +121,7 @@ export function FocusDecor({
           </button>
         </div>
 
-        <p className="mt-5 w-full text-center text-[0.75rem] font-semibold uppercase leading-relaxed tracking-[0.16em] text-ds-gray-3 md:text-left">
-          Break work into focus tasked
-        </p>
+        {variant === 'page' ? tagline : null}
       </div>
     </aside>
   )

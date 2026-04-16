@@ -11,7 +11,7 @@ export function EmptyState() {
       >
         ✦
       </span>
-      <h2 className="font-display mt-5 text-xl font-semibold leading-[1.5] text-ds-ink">
+      <h2 className="mt-5 text-xl font-medium leading-[1.5] text-ds-ink">
         Clear deck
       </h2>
       <p className="mt-2 max-w-sm text-base leading-relaxed text-ds-gray-3">

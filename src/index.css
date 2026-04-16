@@ -3,10 +3,10 @@
 /* Class-based dark (html.dark); tokens swap via CSS variables. */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Tokens aligned with Webflow-style guide; values follow semantic vars for light/dark. */
+/* Semantic colour tokens: light = Allbirds-inspired cream/forest; dark = existing cool shell. */
 @theme {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  /* Allbirds UK (shop) uses Geograph + Self Modern; GF proxies: DM Sans (+ Instrument Serif via .font-editorial). */
+  --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
 
   --color-ds-page: var(--ds-page);
   --color-ds-card: var(--ds-card);
@@ -20,6 +20,7 @@
   --color-ds-primary-soft: var(--ds-primary-soft);
   --color-ds-secondary: var(--ds-secondary);
   --color-ds-highlight: var(--ds-highlight);
+  --color-ds-modal-scrim: var(--ds-modal-scrim);
 
   --shadow-ds-lift: var(--ds-shadow-lift);
   --shadow-ds-lift-lg: var(--ds-shadow-lift-lg);
@@ -28,39 +29,47 @@
 
 @layer base {
   :root {
-    --ds-page: #ebedf3;
-    --ds-card: #ffffff;
-    --ds-ink: #22242c;
-    --ds-gray-4: #484b55;
-    --ds-gray-3: #999dac;
-    --ds-gray-2: #c2c4cf;
-    --ds-gray-1: #ebedf3;
-    --ds-primary: #4263eb;
-    --ds-primary-hover: #3651d4;
-    --ds-primary-soft: #e8edfd;
-    --ds-secondary: #7048e8;
-    --ds-highlight: #cf51c2;
-    --ds-shadow-lift: 0 4px 16px -4px rgb(34 36 44 / 0.1);
-    --ds-shadow-lift-lg: 0 8px 28px -6px rgb(34 36 44 / 0.12);
-    --ds-shadow-press: inset 0 2px 4px rgb(34 36 44 / 0.06);
+    /*
+     * Light theme — Allbirds-inspired (allbirds.co.uk): warm cream canvas, charcoal type,
+     * forest CTA, sage secondary, terracotta accent. Dark theme tokens stay separate below.
+     */
+    --ds-page: #ece9e2;
+    --ds-card: #faf8f4;
+    --ds-ink: #212121;
+    --ds-gray-4: #4a4540;
+    --ds-gray-3: #7a746b;
+    --ds-gray-2: #d1ccc1;
+    --ds-gray-1: #e5e0d6;
+    --ds-primary: #2d4a3e;
+    --ds-primary-hover: #243d32;
+    --ds-primary-soft: #e5ebe8;
+    --ds-secondary: #5a6b62;
+    --ds-highlight: #c2543d;
+    --ds-shadow-lift: 0 4px 18px -4px rgb(33 28 22 / 0.08);
+    --ds-shadow-lift-lg: 0 10px 32px -8px rgb(33 28 22 / 0.1);
+    --ds-shadow-press: inset 0 2px 4px rgb(33 28 22 / 0.06);
+    /* Modal backdrop: warm charcoal scrim (same family as light ink, not theme-flipping). */
+    --ds-modal-scrim: rgb(33 28 22 / 0.34);
   }
 
   .dark {
-    --ds-page: #0c0d12;
-    --ds-card: #16171f;
-    --ds-ink: #ebedf3;
-    --ds-gray-4: #c5c7d2;
-    --ds-gray-3: #8b8d9c;
-    --ds-gray-2: #3e3f4d;
-    --ds-gray-1: #24252f;
-    --ds-primary: #5c7cfa;
-    --ds-primary-hover: #7b91fc;
-    --ds-primary-soft: rgb(92 124 250 / 0.16);
-    --ds-secondary: #9d86f0;
-    --ds-highlight: #e07ad4;
-    --ds-shadow-lift: 0 4px 20px -4px rgb(0 0 0 / 0.45);
-    --ds-shadow-lift-lg: 0 12px 40px -10px rgb(0 0 0 / 0.55);
-    --ds-shadow-press: inset 0 2px 4px rgb(0 0 0 / 0.35);
+    --ds-page: #07080d;
+    --ds-card: #0f1017;
+    --ds-ink: #eef0f6;
+    --ds-gray-4: #a8adbd;
+    --ds-gray-3: #6f7588;
+    --ds-gray-2: #323542;
+    --ds-gray-1: #1a1c26;
+    --ds-primary: #6f87ff;
+    --ds-primary-hover: #96a6ff;
+    --ds-primary-soft: rgb(111 135 255 / 0.2);
+    --ds-secondary: #9f92ff;
+    --ds-highlight: #e886cf;
+    --ds-shadow-lift: 0 4px 22px -4px rgb(0 0 0 / 0.38);
+    --ds-shadow-lift-lg: 0 12px 40px -10px rgb(0 0 0 / 0.48);
+    --ds-shadow-press: inset 0 2px 4px rgb(0 0 0 / 0.28);
+    /* Deep page-aligned scrim with a hint of primary blue (matches dark shell + modal). */
+    --ds-modal-scrim: rgb(12 16 32 / 0.52);
   }
 
   html {
@@ -72,10 +81,12 @@
     min-height: 100dvh;
     font-family: var(--font-sans);
     font-size: 1rem;
-    line-height: 1.5;
+    font-weight: 400;
+    line-height: 1.55;
     color: var(--color-ds-ink);
     background-color: var(--color-ds-page);
     -webkit-font-smoothing: antialiased;
+    font-feature-settings: 'kern' 1, 'liga' 1;
   }
 
   #root {
@@ -83,8 +94,10 @@
   }
 }
 
-.font-display {
-  font-family: var(--font-display);
+/* Editorial “Self Modern”–style moments (Allbirds hero); body/UI use Geograph-like DM Sans. */
+.font-editorial {
+  font-family: 'Instrument Serif', ui-serif, Georgia, 'Times New Roman', serif;
+  letter-spacing: -0.02em;
 }
 
 /* Task row → focus timer handoff (respect reduced motion). */
@@ -128,6 +141,62 @@
   }
 }
 
+@keyframes focus-modal-scrim-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes focus-modal-dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-focus-modal-scrim {
+  animation: focus-modal-scrim-in 0.22s ease-out both;
+}
+
+.animate-focus-modal-dialog {
+  animation: focus-modal-dialog-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes focus-modal-scrim-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes focus-modal-dialog-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
+
+.animate-focus-modal-scrim-out {
+  animation: focus-modal-scrim-out 0.28s ease-in forwards;
+}
+
+.animate-focus-modal-dialog-out {
+  animation: focus-modal-dialog-out 0.32s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
 .animate-timer-handoff {
   animation: timer-handoff 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -140,11 +209,58 @@
   animation: timer-progress-flash 0.5s ease-out both;
 }
 
+/* Mark complete → done: outward ripple + pop on CTA, check icon nudge. */
+@keyframes task-complete-cta {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--ds-primary) 45%, transparent);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 0 0 14px transparent;
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@keyframes task-complete-check {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  40% {
+    transform: scale(1.2) rotate(-10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.animate-task-complete-cta {
+  animation: task-complete-cta 0.48s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.animate-task-complete-check {
+  animation: task-complete-check 0.48s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-timer-handoff,
   .animate-timer-title,
-  .animate-timer-progress-flash {
+  .animate-timer-progress-flash,
+  .animate-task-complete-cta,
+  .animate-task-complete-check {
     animation: none !important;
+  }
+
+  .animate-focus-modal-scrim,
+  .animate-focus-modal-dialog,
+  .animate-focus-modal-scrim-out,
+  .animate-focus-modal-dialog-out {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 

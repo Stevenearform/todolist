@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 type FocusTimerModalProps = {
@@ -7,28 +7,118 @@ type FocusTimerModalProps = {
   children: React.ReactNode
 }
 
+function prefersReducedMotion() {
+  if (typeof window === 'undefined') return false
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+}
+
+function isDisabledControl(el: HTMLElement): boolean {
+  return (
+    (el instanceof HTMLButtonElement ||
+      el instanceof HTMLInputElement ||
+      el instanceof HTMLSelectElement ||
+      el instanceof HTMLTextAreaElement) &&
+    el.disabled
+  )
+}
+
 /**
  * Full-screen overlay with the focus timer; close via icon, backdrop, or Escape.
  */
 export function FocusTimerModal({ open, onClose, children }: FocusTimerModalProps) {
   const closeRef = useRef<HTMLButtonElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const [leaving, setLeaving] = useState(false)
+
+  const requestClose = useCallback(() => {
+    if (prefersReducedMotion()) {
+      onClose()
+      return
+    }
+    setLeaving((prev) => (prev ? prev : true))
+  }, [onClose])
+
+  useLayoutEffect(() => {
+    if (open) setLeaving(false)
+  }, [open])
 
   useEffect(() => {
-    if (!open) return
+    if (!open || !leaving) return
+    const el = dialogRef.current
+    const fallback = window.setTimeout(() => onClose(), 500)
+    const onEnd = (e: AnimationEvent) => {
+      if (e.target !== el) return
+      if (!e.animationName.includes('focus-modal-dialog-out')) return
+      window.clearTimeout(fallback)
+      onClose()
+    }
+    el?.addEventListener('animationend', onEnd)
+    return () => {
+      window.clearTimeout(fallback)
+      el?.removeEventListener('animationend', onEnd)
+    }
+  }, [leaving, open, onClose])
+
+  useEffect(() => {
+    if (!open || leaving) return
     const prevOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
 
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+    function listFocusable(root: HTMLElement): HTMLElement[] {
+      const nodes = root.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      )
+      return Array.from(nodes).filter((el) => {
+        if (isDisabledControl(el) || el.getAttribute('aria-hidden') === 'true') return false
+        return el.offsetWidth > 0 && el.offsetHeight > 0
+      })
     }
-    window.addEventListener('keydown', onKey)
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        requestClose()
+        return
+      }
+      if (e.key !== 'Tab') return
+      const dialog = dialogRef.current
+      if (!dialog) return
+      const list = listFocusable(dialog)
+      if (list.length === 0) return
+      const first = list[0]
+      const last = list[list.length - 1]
+      const active = document.activeElement
+      if (!active || !dialog.contains(active)) return
+      if (e.shiftKey) {
+        if (active === first) {
+          e.preventDefault()
+          last.focus()
+        }
+      } else if (active === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+
+    const onFocusIn = (e: FocusEvent) => {
+      const dialog = dialogRef.current
+      const t = e.target
+      if (!dialog || !(t instanceof Node) || dialog.contains(t)) return
+      e.preventDefault()
+      e.stopPropagation()
+      closeRef.current?.focus()
+    }
+
+    document.addEventListener('keydown', onKeyDown, true)
+    document.addEventListener('focusin', onFocusIn, true)
     queueMicrotask(() => closeRef.current?.focus())
 
     return () => {
       document.body.style.overflow = prevOverflow
-      window.removeEventListener('keydown', onKey)
+      document.removeEventListener('keydown', onKeyDown, true)
+      document.removeEventListener('focusin', onFocusIn, true)
     }
-  }, [open, onClose])
+  }, [open, leaving, requestClose])
 
   if (!open || typeof document === 'undefined') return null
 
@@ -38,29 +128,37 @@ export function FocusTimerModal({ open, onClose, children }: FocusTimerModalProp
       role="presentation"
     >
       <div
-        className="absolute inset-0 bg-ds-ink/55 backdrop-blur-[2px]"
+        className={`absolute inset-0 bg-ds-modal-scrim backdrop-blur-xl backdrop-saturate-125 ${
+          leaving ? 'animate-focus-modal-scrim-out' : 'animate-focus-modal-scrim'
+        }`}
         aria-hidden
-        onClick={onClose}
+        onClick={requestClose}
         role="presentation"
       />
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-labelledby="focus-timer-modal-title"
-        className="relative z-10 w-full max-w-md max-h-[90dvh] overflow-y-auto rounded-2xl border border-ds-gray-2 bg-ds-card p-5 shadow-ds-lift-lg sm:p-6"
+        className={`relative z-10 w-full max-w-md max-h-[90dvh] overflow-y-auto rounded-2xl border border-ds-gray-2 bg-ds-card p-5 shadow-ds-lift-lg sm:p-6 ${
+          leaving ? 'animate-focus-modal-dialog-out' : 'animate-focus-modal-dialog'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 id="focus-timer-modal-title" className="font-display text-lg font-semibold text-ds-ink">
+        <div className="relative mb-4 flex min-h-10 items-center justify-start">
+          <h2
+            id="focus-timer-modal-title"
+            className="min-w-0 flex-1 pr-12 text-left text-lg font-medium text-ds-ink"
+          >
             Focus timer
           </h2>
           <button
             ref={closeRef}
             type="button"
             id="focus-modal-close"
-            onClick={onClose}
+            onClick={requestClose}
             aria-label="Close and return to tasks"
-            className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg text-ds-gray-3 transition hover:bg-ds-gray-1 hover:text-ds-ink"
+            className="absolute right-0 top-1/2 inline-flex size-10 shrink-0 -translate-y-1/2 items-center justify-center rounded-lg text-ds-gray-3 transition hover:bg-ds-gray-1 hover:text-ds-ink"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

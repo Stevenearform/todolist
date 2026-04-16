@@ -22,13 +22,42 @@ export function TodoPage() {
   const [focusModalOpen, setFocusModalOpen] = useState(false)
   const [isCreatingTask, setIsCreatingTask] = useState(false)
   const createTaskTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const returnFocusRef = useRef<HTMLElement | null>(null)
+  const selectedIdRef = useRef<string | null>(null)
 
   const selectedTodo = useMemo(() => {
     if (!selectedId || !todos.some((t) => t.id === selectedId)) return null
     return todos.find((t) => t.id === selectedId) ?? null
   }, [todos, selectedId])
 
+  useEffect(() => {
+    selectedIdRef.current = selectedId
+  }, [selectedId])
+
   const isFocusModalVisible = focusModalOpen && Boolean(selectedTodo)
+
+  const restoreFocusAfterModal = useCallback(() => {
+    const last = returnFocusRef.current
+    returnFocusRef.current = null
+    queueMicrotask(() => {
+      const id = selectedIdRef.current
+      const row = id ? document.querySelector<HTMLElement>(`[data-todo-id="${id}"]`) : null
+      if (last && document.body.contains(last) && last !== document.body) {
+        last.focus()
+        return
+      }
+      if (row) {
+        row.focus()
+        return
+      }
+      document.getElementById('todo-input')?.focus()
+    })
+  }, [])
+
+  const handleFocusModalClose = useCallback(() => {
+    setFocusModalOpen(false)
+    restoreFocusAfterModal()
+  }, [restoreFocusAfterModal])
 
   const handleDelete = useCallback(
     (id: string) => {
@@ -38,6 +67,11 @@ export function TodoPage() {
         setSecondsLeft(POMODORO_SECONDS)
         setIsRunning(false)
         setFocusModalOpen(false)
+        queueMicrotask(() => {
+          const next = document.querySelector<HTMLElement>('[data-todo-id]')
+          if (next) next.focus()
+          else document.getElementById('todo-input')?.focus()
+        })
       }
     },
     [dispatch, selectedId],
@@ -94,6 +128,8 @@ export function TodoPage() {
   )
 
   const handleSelectTodo = useCallback((id: string) => {
+    const ae = document.activeElement
+    returnFocusRef.current = ae instanceof HTMLElement ? ae : null
     setSelectPulseKey((k) => k + 1)
     setFocusModalOpen(true)
     setSelectedId((prev) => {
@@ -138,7 +174,7 @@ export function TodoPage() {
         )}
       </div>
 
-      <FocusTimerModal open={isFocusModalVisible} onClose={() => setFocusModalOpen(false)}>
+      <FocusTimerModal open={isFocusModalVisible} onClose={handleFocusModalClose}>
         <FocusDecor {...focusDecorProps} variant="modal" />
       </FocusTimerModal>
     </div>
