@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { createTodoId } from '../lib/createTodoId'
+import { tryVibrate } from '../lib/haptics'
 import { useTodoApp } from '../context/useTodoApp'
 import { EmptyState } from './EmptyState'
 import { ErrorState } from './ErrorState'
@@ -10,10 +12,24 @@ import { TodoList } from './TodoList'
 const POMODORO_SECONDS = 25 * 60
 /** Minimum time to show create-task loading so the animation is perceptible (sync add is instant). */
 const TASK_CREATE_UI_MS = 2000
+const NEW_ROW_ENTER_MS = 560
 
 export function TodoPage() {
   const { state, dispatch } = useTodoApp()
   const { todos, error } = state
+
+  /** Open preview with `/?error=1` or `/?showError=1` to surface the sync ErrorState once. */
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('error') !== '1' && params.get('showError') !== '1') return
+    dispatch({ type: 'SIMULATE_ERROR' })
+    params.delete('error')
+    params.delete('showError')
+    const q = params.toString()
+    const path = window.location.pathname
+    const next = q ? `${path}?${q}` : path
+    window.history.replaceState(null, '', `${next}${window.location.hash}`)
+  }, [dispatch])
 
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [secondsLeft, setSecondsLeft] = useState(POMODORO_SECONDS)
@@ -21,7 +37,9 @@ export function TodoPage() {
   const [selectPulseKey, setSelectPulseKey] = useState(0)
   const [focusModalOpen, setFocusModalOpen] = useState(false)
   const [isCreatingTask, setIsCreatingTask] = useState(false)
+  const [highlightEntryId, setHighlightEntryId] = useState<string | null>(null)
   const createTaskTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const highlightClearRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const returnFocusRef = useRef<HTMLElement | null>(null)
   const selectedIdRef = useRef<string | null>(null)
 
@@ -108,8 +126,31 @@ export function TodoPage() {
       if (createTaskTimeoutRef.current) {
         window.clearTimeout(createTaskTimeoutRef.current)
       }
+      if (highlightClearRef.current) {
+        window.clearTimeout(highlightClearRef.current)
+      }
     }
   }, [])
+
+  useEffect(() => {
+    if (!highlightEntryId) return
+    queueMicrotask(() => {
+      document
+        .querySelector<HTMLElement>(`[data-todo-id="${highlightEntryId}"]`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    })
+    if (highlightClearRef.current) window.clearTimeout(highlightClearRef.current)
+    highlightClearRef.current = window.setTimeout(() => {
+      highlightClearRef.current = null
+      setHighlightEntryId(null)
+    }, NEW_ROW_ENTER_MS)
+    return () => {
+      if (highlightClearRef.current) {
+        window.clearTimeout(highlightClearRef.current)
+        highlightClearRef.current = null
+      }
+    }
+  }, [highlightEntryId])
 
   const handleAddTask = useCallback(
     (title: string) => {
@@ -117,8 +158,11 @@ export function TodoPage() {
         window.clearTimeout(createTaskTimeoutRef.current)
         createTaskTimeoutRef.current = null
       }
+      const id = createTodoId()
       setIsCreatingTask(true)
-      dispatch({ type: 'ADD', title })
+      dispatch({ type: 'ADD', title, id })
+      setHighlightEntryId(id)
+      tryVibrate(12)
       createTaskTimeoutRef.current = window.setTimeout(() => {
         createTaskTimeoutRef.current = null
         setIsCreatingTask(false)

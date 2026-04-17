@@ -40,7 +40,7 @@ export function ThemeToggle() {
           type="button"
           onClick={() => setPref(value)}
           aria-pressed={pref === value}
-          className={`min-h-9 rounded-md px-2.5 text-xs font-semibold transition sm:px-3 ${
+          className={`font-syne min-h-9 rounded-md px-2.5 text-[10px] font-bold uppercase tracking-wider transition sm:px-3 ${
             pref === value
               ? 'bg-ds-card text-ds-ink shadow-ds-lift'
               : 'text-ds-gray-3 hover:text-ds-ink'

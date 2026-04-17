@@ -6,22 +6,22 @@ type ErrorStateProps = {
 export function ErrorState({ message, onRetry }: ErrorStateProps) {
   return (
     <div
-      className="mt-10 rounded-2xl border border-ds-gray-2 bg-ds-gray-1 px-6 py-10 text-center shadow-ds-lift"
+      className="mt-10 rounded-3xl border border-ds-gray-2/90 bg-ds-gray-1/90 px-6 py-11 text-center shadow-ds-lift backdrop-blur-[2px]"
       role="alert"
     >
-      <p className="text-xs font-semibold uppercase tracking-wider text-ds-highlight">
-        Sync issue
+      <p className="font-syne text-[10px] font-bold uppercase tracking-[0.2em] text-ds-highlight">
+        Heads up
       </p>
-      <h2 className="mt-2 text-xl font-medium leading-[1.5] text-ds-ink">
-        Let’s try that again
+      <h2 className="font-editorial mt-3 text-2xl font-medium leading-snug text-ds-ink sm:text-[1.65rem]">
+        That didn’t land
       </h2>
-      <p className="mt-3 text-base leading-relaxed text-ds-gray-3">{message}</p>
+      <p className="mt-3 text-sm leading-relaxed text-ds-gray-3 sm:text-base">{message}</p>
       <button
         type="button"
         onClick={onRetry}
-        className="mt-8 h-12 min-w-40 rounded-lg bg-ds-primary px-6 text-sm font-semibold text-white shadow-ds-lift transition hover:bg-ds-primary-hover active:shadow-ds-press"
+        className="font-syne mt-9 h-12 min-w-40 rounded-xl bg-gradient-to-br from-ds-primary to-ds-primary-hover px-6 text-[11px] font-bold uppercase tracking-[0.14em] text-white shadow-ds-lift transition hover:brightness-[1.04] active:shadow-ds-press"
       >
-        Retry
+        Try again
       </button>
     </div>
   )

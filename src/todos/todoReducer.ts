@@ -7,7 +7,7 @@ export type TodoAppState = {
 }
 
 export type TodoAction =
-  | { type: 'ADD'; title: string }
+  | { type: 'ADD'; title: string; id?: string }
   | { type: 'TOGGLE'; id: string }
   | { type: 'DELETE'; id: string }
   | { type: 'ADD_FOCUS_SECONDS'; id: string; seconds: number }
@@ -20,7 +20,7 @@ export function todoReducer(state: TodoAppState, action: TodoAction): TodoAppSta
       const title = action.title.trim()
       if (!title) return state
       const next: Todo = {
-        id: createTodoId(),
+        id: action.id ?? createTodoId(),
         title,
         completed: false,
         createdAt: new Date().toISOString(),

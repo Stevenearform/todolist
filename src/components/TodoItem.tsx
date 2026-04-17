@@ -2,8 +2,10 @@ import { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from
 import type { Todo } from '../types/todo'
 import { formatCountdown } from '../lib/formatCountdown'
 import { formatTodoCreatedAt } from '../lib/formatTodoCreatedAt'
+import { tryVibrate } from '../lib/haptics'
 
 const COMPLETE_ANIM_MS = 480
+const DELETE_ANIM_MS = 300
 
 type TodoItemProps = {
   todo: Todo
@@ -23,7 +25,9 @@ export function TodoItem({
   onDelete,
 }: TodoItemProps) {
   const [isCompleting, setIsCompleting] = useState(false)
+  const [isLeaving, setIsLeaving] = useState(false)
   const completeTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null)
+  const deleteTimerRef = useRef<ReturnType<typeof window.setTimeout> | null>(null)
   const mountedRef = useRef(true)
   const spent = formatCountdown(todo.focusSecondsLogged)
 
@@ -32,6 +36,7 @@ export function TodoItem({
     return () => {
       mountedRef.current = false
       if (completeTimerRef.current) window.clearTimeout(completeTimerRef.current)
+      if (deleteTimerRef.current) window.clearTimeout(deleteTimerRef.current)
     }
   }, [])
 
@@ -66,11 +71,13 @@ export function TodoItem({
   const titleId = `${todo.id}-task-title`
 
   function handleRowClick(e: MouseEvent<HTMLLIElement>) {
+    if (isLeaving) return
     ;(e.currentTarget as HTMLLIElement).focus()
     onSelect()
   }
 
   function handleRowKeyDown(e: KeyboardEvent<HTMLLIElement>) {
+    if (isLeaving) return
     if (e.target !== e.currentTarget) return
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
@@ -78,16 +85,35 @@ export function TodoItem({
     }
   }
 
+  function handleDeleteClick(e: MouseEvent<HTMLButtonElement>) {
+    e.stopPropagation()
+    if (isLeaving) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      tryVibrate(8)
+      onDelete(todo.id)
+      return
+    }
+    setIsLeaving(true)
+    deleteTimerRef.current = window.setTimeout(() => {
+      deleteTimerRef.current = null
+      tryVibrate(10)
+      onDelete(todo.id)
+    }, DELETE_ANIM_MS)
+  }
+
   return (
     <li
       data-todo-id={todo.id}
-      tabIndex={0}
+      tabIndex={isLeaving ? -1 : 0}
       onClick={handleRowClick}
       onKeyDown={handleRowKeyDown}
+      aria-busy={isLeaving}
       aria-current={isSelected ? 'true' : undefined}
       aria-labelledby={titleId}
       aria-describedby={!todo.completed ? focusHintId : undefined}
-      className={`flex flex-col gap-4 rounded-2xl border px-4 py-6 outline-none transition duration-200 ease-out sm:gap-5 sm:px-5 sm:py-8 focus-visible:ring-2 focus-visible:ring-offset-2 ${rowClass} ${selectionRing} ${
+      className={`flex flex-col gap-4 rounded-3xl border px-4 py-6 outline-none transition duration-200 ease-out sm:gap-5 sm:px-5 sm:py-8 focus-visible:ring-2 focus-visible:ring-offset-2 ${rowClass} ${selectionRing} ${
+        isLeaving ? 'pointer-events-none motion-safe:animate-task-delete-out ' : ''
+      } ${
         todo.completed
           ? 'focus-visible:ring-ds-primary/50 focus-visible:ring-offset-ds-gray-1'
           : 'focus-visible:ring-white/70 focus-visible:ring-offset-ds-primary'
@@ -194,8 +220,8 @@ export function TodoItem({
               className="size-7 shrink-0 opacity-90 sm:size-8"
               aria-hidden
             >
-              <path d="M9 14 4 9l5-5" />
-              <path d="M20 9v6a2 2 0 0 1-2 2H6" />
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+              <path d="M3 3v5h5" />
             </svg>
             <span>Mark not done</span>
           </>
@@ -228,12 +254,11 @@ export function TodoItem({
 
       <button
         type="button"
-        onClick={(e) => {
-          e.stopPropagation()
-          onDelete(todo.id)
-        }}
+        onClick={handleDeleteClick}
+        disabled={isLeaving}
+        aria-busy={isLeaving}
         aria-label={`Delete ${todo.title}`}
-        className={`font-editorial inline-flex min-h-12 w-full items-center justify-center rounded-xl border px-4 py-3.5 text-center text-xl font-medium leading-none tracking-tight transition sm:min-h-14 sm:px-5 sm:py-4 sm:text-2xl ${
+        className={`font-editorial inline-flex min-h-12 w-full items-center justify-center rounded-xl border px-4 py-3.5 text-center text-xl font-medium leading-none tracking-tight transition active:scale-[0.98] disabled:pointer-events-none disabled:opacity-70 sm:min-h-14 sm:px-5 sm:py-4 sm:text-2xl ${
           todo.completed
             ? 'border-ds-gray-2 bg-transparent text-ds-gray-4 hover:border-ds-primary/40 hover:bg-ds-primary-soft hover:text-ds-primary active:text-ds-ink'
             : 'border-white/30 bg-transparent text-white/90 hover:border-white/50 hover:bg-white/12 hover:text-white active:text-white'

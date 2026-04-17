@@ -39,7 +39,9 @@ export function FocusTimerModal({ open, onClose, children }: FocusTimerModalProp
   }, [onClose])
 
   useLayoutEffect(() => {
-    if (open) setLeaving(false)
+    if (!open) return
+    const id = requestAnimationFrame(() => setLeaving(false))
+    return () => cancelAnimationFrame(id)
   }, [open])
 
   useEffect(() => {
@@ -140,25 +142,34 @@ export function FocusTimerModal({ open, onClose, children }: FocusTimerModalProp
         role="dialog"
         aria-modal="true"
         aria-labelledby="focus-timer-modal-title"
-        className={`relative z-10 w-full max-w-md max-h-[90dvh] overflow-y-auto rounded-2xl border border-ds-gray-2 bg-ds-card p-5 shadow-ds-lift-lg sm:p-6 ${
+        className={`ds-studio-card relative z-10 w-full max-w-md max-h-[90dvh] overflow-y-auto rounded-3xl border border-ds-gray-2/90 bg-ds-card p-6 shadow-ds-lift-lg sm:p-7 ${
           leaving ? 'animate-focus-modal-dialog-out' : 'animate-focus-modal-dialog'
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="relative mb-4 flex min-h-10 items-center justify-start">
-          <h2
-            id="focus-timer-modal-title"
-            className="min-w-0 flex-1 pr-12 text-left text-lg font-medium text-ds-ink"
-          >
-            Focus timer
-          </h2>
+        <div className="relative mb-6 flex min-h-11 items-start gap-4 sm:gap-5">
+          <div
+            className="mt-1 hidden w-1 shrink-0 self-stretch rounded-full bg-gradient-to-b from-ds-highlight via-ds-primary to-ds-secondary opacity-90 sm:block"
+            aria-hidden
+          />
+          <div className="min-w-0 flex-1 pr-14 text-left">
+            <p className="font-syne text-[10px] font-bold uppercase tracking-[0.2em] text-ds-gray-3">
+              Session
+            </p>
+            <h2
+              id="focus-timer-modal-title"
+              className="font-editorial mt-2 text-balance bg-gradient-to-br from-ds-ink via-ds-ink to-ds-primary bg-clip-text text-2xl font-medium leading-tight tracking-tight text-transparent sm:text-3xl"
+            >
+              Focus timer
+            </h2>
+          </div>
           <button
             ref={closeRef}
             type="button"
             id="focus-modal-close"
             onClick={requestClose}
             aria-label="Close and return to tasks"
-            className="absolute right-0 top-1/2 inline-flex size-10 shrink-0 -translate-y-1/2 items-center justify-center rounded-lg text-ds-gray-3 transition hover:bg-ds-gray-1 hover:text-ds-ink"
+            className="absolute right-0 top-0 inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-ds-gray-2 bg-ds-gray-1/80 text-ds-gray-3 shadow-ds-lift backdrop-blur-sm transition hover:border-ds-primary/40 hover:text-ds-primary dark:bg-ds-gray-1/40"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -27,16 +27,16 @@ export function TodoComposer({ onAdd, isSubmitting = false }: TodoComposerProps)
     <form
       onSubmit={onSubmit}
       aria-busy={isSubmitting}
-      className="grid w-full gap-x-3 gap-y-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-x-4"
+      className="grid w-full gap-x-3 gap-y-7 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center sm:gap-x-5 sm:gap-y-8"
     >
       <label
         htmlFor="todo-input"
-        className="font-editorial text-left text-[2rem] font-medium uppercase leading-none tracking-tight text-ds-gray-3 sm:col-span-2 sm:text-[2.25rem]"
+        className="font-editorial border-l-8 border-ds-highlight pl-2 text-left text-[1.85rem] font-medium uppercase leading-[1.05] tracking-tighter text-ds-gray-4 sm:col-span-2 sm:pl-3 sm:text-[2.35rem]"
       >
-        New task
+        Create a new task
       </label>
 
-      <div className="box-border flex h-14 min-h-14 w-full min-w-0 items-center rounded-lg border border-ds-gray-2 bg-ds-card px-4 shadow-ds-lift ring-ds-primary/20 focus-within:border-ds-primary focus-within:ring-4 sm:px-5">
+      <div className="box-border flex h-14 min-h-14 w-full min-w-0 items-center rounded-xl border border-ds-gray-2/90 bg-ds-card px-4 shadow-ds-field ring-ds-primary/15 focus-within:border-ds-primary focus-within:ring-4 sm:px-5">
         <input
           id="todo-input"
           type="text"
@@ -53,7 +53,7 @@ export function TodoComposer({ onAdd, isSubmitting = false }: TodoComposerProps)
         type="submit"
         disabled={isSubmitting}
         aria-busy={isSubmitting}
-        className="font-editorial box-border inline-flex h-[4.25rem] min-h-[4.25rem] w-full min-w-[11.5rem] shrink-0 items-center justify-center gap-3 rounded-xl bg-ds-primary px-8 text-2xl font-medium leading-none tracking-tight text-white shadow-ds-lift transition hover:bg-ds-primary-hover active:shadow-ds-press disabled:pointer-events-none disabled:opacity-90 sm:w-auto sm:min-w-[12.5rem] sm:px-11"
+        className="font-editorial box-border inline-flex h-[4.25rem] min-h-[4.25rem] w-full min-w-[11.5rem] shrink-0 items-center justify-center gap-3 rounded-2xl bg-gradient-to-br from-ds-primary to-ds-primary-hover px-8 text-2xl font-medium leading-none tracking-tight text-white shadow-ds-lift transition hover:brightness-[1.04] active:shadow-ds-press disabled:pointer-events-none disabled:opacity-90 sm:w-auto sm:min-w-[12.5rem] sm:px-11"
       >
         {isSubmitting ? (
           <>

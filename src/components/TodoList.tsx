@@ -1,6 +1,12 @@
 import { useMemo } from 'react'
+import { useAutoAnimate } from '@formkit/auto-animate/react'
 import type { Todo } from '../types/todo'
 import { TodoItem } from './TodoItem'
+
+const listAnimOptions = {
+  duration: 280,
+  easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+} as const
 
 type TodoListProps = {
   todos: Todo[]
@@ -19,6 +25,9 @@ export function TodoList({
   onToggle,
   onDelete,
 }: TodoListProps) {
+  const [activeListRef] = useAutoAnimate(listAnimOptions)
+  const [completedListRef] = useAutoAnimate(listAnimOptions)
+
   const { active, completed } = useMemo(() => {
     const active = todos.filter((t) => !t.completed)
     const completed = todos.filter((t) => t.completed)
@@ -28,19 +37,19 @@ export function TodoList({
   return (
     <div className="mt-8">
       <div className="mb-5 flex items-center justify-between gap-2 sm:mb-6">
-        <h2 className="text-sm font-medium uppercase tracking-wider text-ds-gray-3">
+        <h2 className="font-syne text-[10px] font-bold uppercase tracking-[0.22em] text-ds-gray-3">
           In progress
         </h2>
-        <span className="rounded-full bg-ds-primary-soft px-3 py-0.5 text-xs font-semibold text-ds-primary">
+        <span className="rounded-full border border-ds-primary/15 bg-ds-primary-soft px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ds-primary">
           {active.length} {active.length === 1 ? 'task' : 'tasks'}
         </span>
       </div>
       {active.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-ds-gray-2 bg-ds-gray-1 px-4 py-6 text-center text-sm text-ds-gray-3">
-          No active tasks. Mark a task incomplete to move it back here, or add a new one above.
+        <p className="rounded-xl border border-dashed border-ds-gray-2/80 bg-ds-gray-1/80 px-4 py-6 text-center text-sm leading-relaxed text-ds-gray-3 backdrop-blur-[2px]">
+          Nothing in motion yet. Add something above, or move a card back from Done.
         </p>
       ) : (
-        <ul className="flex flex-col gap-4 sm:gap-5">
+        <ul ref={activeListRef} className="flex flex-col gap-4 sm:gap-5">
           {active.map((todo) => (
             <TodoItem
               key={todo.id}
@@ -58,14 +67,14 @@ export function TodoList({
       {completed.length > 0 ? (
         <div className="mt-12 sm:mt-14">
           <div className="mb-5 flex items-center justify-between gap-2 sm:mb-6">
-            <h2 className="text-sm font-medium uppercase tracking-wider text-ds-gray-3">
-              Completed
+            <h2 className="font-syne text-[10px] font-bold uppercase tracking-[0.22em] text-ds-gray-3">
+              Done
             </h2>
-            <span className="rounded-full border border-ds-gray-2 bg-ds-gray-1 px-3 py-0.5 text-xs font-semibold text-ds-gray-4">
+            <span className="rounded-full border border-ds-gray-2 bg-ds-gray-1 px-3 py-0.5 text-[10px] font-bold uppercase tracking-wider text-ds-gray-4">
               {completed.length} {completed.length === 1 ? 'task' : 'tasks'}
             </span>
           </div>
-          <ul className="flex flex-col gap-4 sm:gap-5">
+          <ul ref={completedListRef} className="flex flex-col gap-4 sm:gap-5">
             {completed.map((todo) => (
               <TodoItem
                 key={todo.id}
