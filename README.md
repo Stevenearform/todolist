@@ -1,6 +1,10 @@
 # React + TypeScript + Vite
 
+**BMAD + Cursor:** see [`docs/README-BMAD-Cursor.md`](./docs/README-BMAD-Cursor.md) for how spec-first passes and AI-assisted implementation were used on this prototype.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+
+**Product spec (demo scope):** [`docs/spec/01-prd-and-brief.md`](./docs/spec/01-prd-and-brief.md) · [component inventory](./docs/spec/02-component-inventory.md) · [user stories](./docs/spec/03-user-stories.md)
 
 Currently, two official plugins are available:
 
